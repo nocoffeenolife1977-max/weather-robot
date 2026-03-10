@@ -1,0 +1,33 @@
+name: お天気ロボット - 毎日自動実行
+
+on:
+  schedule:
+    # 毎朝 7:00 JST (= UTC 22:00 前日) に実行
+    - cron: "0 22 * * *"
+  workflow_dispatch:   # 手動実行も可能
+
+jobs:
+  run-weather-robot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Python のセットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: お天気スクリプトを実行
+        run: python weather_robot.py
+
+      - name: weather.txt をコミット & プッシュ
+        run: |
+          git config user.name  "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add weather.txt
+          git diff --cached --quiet || git commit -m "chore: 天気レポートを更新 $(date +'%Y-%m-%d')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
