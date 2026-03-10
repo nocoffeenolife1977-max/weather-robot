@@ -2,7 +2,7 @@
 お天気ロボット - 毎日の天気情報を取得して weather.txt に保存するスクリプト
 使用API:
   - Open-Meteo (天気データ、無料・登録不要)
-  - ip-api.com (現在地の自動検出)
+対象地点: 神奈川県小田原市（固定）
 """
 
 import urllib.request
@@ -11,16 +11,19 @@ import json
 import datetime
 import os
 
+# 場所の固定設定（小田原市）
+LOCATION = {
+    "city"       : "小田原市",
+    "regionName" : "神奈川県",
+    "country"    : "Japan",
+    "lat"        : 35.2646,
+    "lon"        : 139.1528,
+}
+
 
 def get_location() -> dict:
-    """ip-api.com で現在地の緯度・経度・都市名を取得する。"""
-    url = "http://ip-api.com/json/?lang=ja&fields=status,city,regionName,country,lat,lon"
-    req = urllib.request.Request(url, headers={"User-Agent": "WeatherRobot/1.0"})
-    with urllib.request.urlopen(req, timeout=10) as res:
-        data = json.loads(res.read().decode("utf-8"))
-    if data.get("status") != "success":
-        raise RuntimeError("現在地の取得に失敗しました。")
-    return data
+    """固定の場所情報を返す（小田原市）。"""
+    return LOCATION
 
 
 # Open-Meteo の WMO 天気コードを日本語に変換
